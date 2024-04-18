@@ -35,9 +35,9 @@ Stying's Quran Bot is a Discord bot designed to provide users with access to Qur
 
 4. Create a '.env' file in the project directory and add your Discord Bot Token:
 
-   ```bash
-   DISCORD_TOKEN=your_discord_bot_token_here
-   ```
+  ```bash
+  DISCORD_TOKEN=your_discord_bot_token_here
+  ```
 
 
 ### Running the Bot
