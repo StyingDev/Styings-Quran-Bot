@@ -45,7 +45,7 @@ Stying's Quran Bot is a Discord bot designed to provide users with access to Qur
 Run the following command to start the bot:
 
   ```bash
-  python bot.py
+  python main.py
   ```
 
 ## Usage
