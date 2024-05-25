@@ -5,14 +5,13 @@ import os
 import json
 from dotenv import load_dotenv
 
-
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix="B!", intents=intents)
 
-# Store the currently looping surah
+# Store the currently looping surah and looping status
 looping_surahs = {}
 
 @client.event
@@ -126,14 +125,14 @@ class QuranListeningSelect(discord.ui.Select):
                 voice_client.play(discord.FFmpegOpusAudio(audio_url, **ffmpeg_options))  # Play the new surah with ffmpeg_options
                 chapter_name = [chapter_name for chapter_number, chapter_name in quran_chapters.items() if chapter_number == str(selected_surah_number)][0]
                 await interaction.response.send_message(content=f"Playing {chapter_name}...", ephemeral=True)
-                looping_surahs[guild.id] = (voice_client, audio_url)  # Save looping info
+                looping_surahs[guild.id] = (voice_client, audio_url, False)  # Save looping info with looping status
             else:  # If bot is not connected to a voice channel
                 await voice_state.channel.connect()  # Connect to the user's voice channel
                 voice_client = guild.voice_client
                 voice_client.play(discord.FFmpegOpusAudio(audio_url, **ffmpeg_options))  # Play the selected surah with ffmpeg_options
                 chapter_name = [chapter_name for chapter_number, chapter_name in quran_chapters.items() if chapter_number == str(selected_surah_number)][0]
                 await interaction.response.send_message(content=f"Playing {chapter_name}...", ephemeral=True)
-                looping_surahs[guild.id] = (voice_client, audio_url)  # Save looping info
+                looping_surahs[guild.id] = (voice_client, audio_url, False)  # Save looping info with looping status
         else:
             await interaction.response.send_message(content="You need to be in a voice channel to use this command.", ephemeral=True)
 
@@ -171,9 +170,9 @@ async def loop(ctx):
     voice_client = ctx.guild.voice_client
     if voice_client and voice_client.is_playing():
         # Ensure audio_url is correctly captured
-        current_audio_url = next((url for vc, url in looping_surahs.values() if vc == voice_client), None)
+        current_audio_url = next((url for vc, url, is_looping in looping_surahs.values() if vc == voice_client), None)
         if current_audio_url:
-            looping_surahs[ctx.guild.id] = (voice_client, current_audio_url)  # Save looping info
+            looping_surahs[ctx.guild.id] = (voice_client, current_audio_url, True)  # Enable looping
             await ctx.send("Looping the current recitation.")
         else:
             await ctx.send("Error: Could not determine the current audio URL.")
@@ -183,15 +182,16 @@ async def loop(ctx):
 @client.hybrid_command(name='stoploop', help='Stop looping the current recitation.')
 async def stoploop(ctx):
     if ctx.guild.id in looping_surahs:
-        del looping_surahs[ctx.guild.id]  # Remove from looping_surahs
+        voice_client, audio_url, _ = looping_surahs[ctx.guild.id]
+        looping_surahs[ctx.guild.id] = (voice_client, audio_url, False)  # Disable looping
         await ctx.send("Stopped looping the current recitation.")
     else:
         await ctx.send("No recitation is currently being looped.")
 
 @tasks.loop(seconds=1.0)
 async def check_looping():
-    for guild_id, (voice_client, audio_url) in list(looping_surahs.items()):
-        if not voice_client.is_playing():
+    for guild_id, (voice_client, audio_url, is_looping) in list(looping_surahs.items()):
+        if is_looping and not voice_client.is_playing():
             new_audio = discord.FFmpegOpusAudio(audio_url, **ffmpeg_options)
             voice_client.play(new_audio)
 
