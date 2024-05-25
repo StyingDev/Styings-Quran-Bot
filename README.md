@@ -54,8 +54,10 @@ Run the following command to start the bot:
    - /read: Select and read verses from different chapters of the Quran.
    - /recite: Select and listen to audio recitations of Quranic chapters (Surahs).
    - /leave: Select and bot will promt the bot the leave the Voice chat.
-   - /pause: Select and pause the playing audio
-   - /resume select and resume the playing audio
+   - /pause: Select and pause the playing audio.
+   - /resume select and resume the playing audio.
+   - /loop Select and loop the playing audio.
+   - /stoploop Select and stop looping the playing audio.
 
 ### Selecting Chapters
 
