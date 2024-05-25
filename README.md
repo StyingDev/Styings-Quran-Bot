@@ -1,6 +1,7 @@
 # Stying's Quran Bot 📖🕌
 
 Stying's Quran Bot is a Discord bot designed to provide users with access to Quranic verses and audio recitations directly within their Discord servers. With QuranBot, users can easily read verses from different chapters (Surahs) of the Quran and listen to audio recitations in various voices.
+[Invite the Bot!](https://discord.com/oauth2/authorize?client_id=1230056938847338497&permissions=277028587584&scope=bot)
 
 ## Features
 
