@@ -3,10 +3,14 @@ from discord.ext import commands, tasks
 import aiohttp
 import os
 import json
+import logging
 from dotenv import load_dotenv
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix="B!", intents=intents)
@@ -18,7 +22,7 @@ looping_surahs = {}
 async def on_ready():
     await client.change_presence(activity=discord.Game(name="🌲linktr.ee/Stying"))
     await client.tree.sync()
-    print(f'We have logged in as {client.user.name}')
+    logging.info(f'We have logged in as {client.user.name}')
     if not check_looping.is_running():
         check_looping.start()
 
@@ -35,7 +39,7 @@ async def get_quran_data(chapter_number):
             if response.status == 200:
                 return await response.json()
             else:
-                print(f"Error fetching Quran data: {response.status}")
+                logging.error(f"Error fetching Quran data: {response.status}")
                 return None
 
 ffmpeg_options = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
@@ -207,3 +211,4 @@ async def recite(ctx):
 
 # Run the bot
 client.run(TOKEN)
+
